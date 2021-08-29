@@ -2,23 +2,19 @@ import pytest
 
 
 @pytest.fixture
-def log(result):
-    """
-    Write log to file
-    :param result:
-    """
-    my_file = open("log.txt", "a+")
-    my_file.write(f"valid test: {str(result)} \n")
+def log(request, result):
+    file_name = request.config.getoption("--logfile")
+    with open(file_name, "a+") as f_obj:
+        f_obj.write(f"test: {result}\n")
     yield
-    my_file.close()
+    f_obj.close()
 
-@pytest.fixture
-def log_un(result):
-    """
-    Write log to file
-    :param result:
-    """
-    my_file = open("log.txt", "a+")
-    my_file.write(f"unvalid test: {str(result)} \n")
-    yield
-    my_file.close()
+def pytest_addoption(parser):
+    parser.addoption(
+        "--logfile",
+        action="store",
+        default="log.txt",
+        help="File for recording test results",
+    )
+
+
